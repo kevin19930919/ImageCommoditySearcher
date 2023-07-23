@@ -7,7 +7,7 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
 import os
 import configparser
-import re
+from util.keyword_parser import parse
 
 secrets = configparser.ConfigParser()
 secrets.read('secret.ini')
@@ -46,9 +46,7 @@ def handle_message(event):
     caption = image_caption_handler.generate_caption(image)
 
     keyword_generator =  KeywordGenerator(key=OPENAI_API_KEY)
-    result = keyword_generator.generate(caption)
-    pattern = r'[^\u4e00-\u9fffA-Za-z0-9]'
-    result = re.sub(pattern, '', result)
+    result = parse(keyword_generator.generate(caption))
 
     shopee_link = "https://shopee.tw/search?keyword=" + result
     print(shopee_link)
