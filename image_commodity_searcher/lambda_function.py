@@ -1,7 +1,6 @@
 from PIL import Image
-from image_caption import ImageCaptionHandler
-from keyword_generator import KeywordGenerator
-from flask import Flask, request, abort
+from image_commodity_searcher.image_caption import ImageCaptionHandler
+from image_commodity_searcher.keyword_generator import KeywordGenerator
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
@@ -16,22 +15,25 @@ CHANNEL_ACCESS_TOKEN = secrets['DEFAULT']['CHANNEL_ACCESS_TOKEN']
 OPENAI_API_KEY = secrets['DEFAULT']['OPENAI_API_KEY']
 
 
-app = Flask(__name__)
 
 line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(CHANNEL_SECRET)
 
 
-@app.route("/search-commodity", methods=['POST'])
-def callback():
-    signature = request.headers['X-Line-Signature']
-    body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
+def handler(event, context):
+    signature = event.headers['X-Line-Signature']
+    body = event["body"]
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
-        abort(400)
-    return 'OK'
+        {
+            "statusCode": 400,
+            "body": "InvalidSignatureError"
+        }
+    return {
+        "statusCode": 200,
+        "body": "ok"    
+    }
 
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_message(event):
@@ -49,10 +51,6 @@ def handle_message(event):
     result = parse(keyword_generator.generate(caption))
 
     shopee_link = "https://shopee.tw/search?keyword=" + result
-    print(shopee_link)
-        
+            
     os.remove(filename)    
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text=shopee_link))
-
-if __name__ == "__main__":
-    app.run(host='localhost', port=1219)

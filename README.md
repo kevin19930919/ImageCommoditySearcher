@@ -89,7 +89,7 @@ To use Image Commodity Searcher, follow these steps:
 
 ## Authors
 
-Image Commodity Searcher is developed and maintained by Kevin Chen.
+Image Commodity Searcher is developed and maintained by Kevin Tsai.
 
 ## Contributing
 
