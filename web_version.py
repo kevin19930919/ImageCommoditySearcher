@@ -1,5 +1,5 @@
 from PIL import Image
-from image_commodity_searcher.image_caption import ImageCaptionHandler
+from image_commodity_searcher.image_caption import ImageCaptionHandler, ImageCaptionVitGpt2Handler
 from image_commodity_searcher.keyword_generator import KeywordGenerator
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
@@ -41,7 +41,7 @@ def handle_message(event):
         fd.write(message_content.content)
     
     image = Image.open(filename)
-    image_caption_handler = ImageCaptionHandler()
+    image_caption_handler = ImageCaptionVitGpt2Handler()
 
     caption = image_caption_handler.generate_caption(image)
 
